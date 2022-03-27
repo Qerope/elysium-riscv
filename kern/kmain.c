@@ -1,11 +1,11 @@
 #include <stdint.h>
 
 #include <arch/sbi.h>
+#include <ely/platform.h>
 
 void kmain(uint64_t hartid, uint64_t dtb)
 {
-    (void)hartid; (void)dtb;
-    const char *s = "Elysium\n";
-    while (*s) sbi_putchar_legacy(*s++);
+    (void)hartid;
+    kprintf("Elysium booting on hart %d\n", (int)hartid);
     for (;;) __asm__ volatile("wfi");
 }
