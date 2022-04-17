@@ -26,17 +26,25 @@ static int walk(const void *fdt, prop_cb cb, void *ctx)
 {
     const uint8_t *base = fdt;
     if (be32(base) != FDT_MAGIC) return -1;
+    uint32_t total = be32(base + 4);
     uint32_t off_struct = be32(base + 8), off_strings = be32(base + 12);
+    if (off_struct >= total || off_strings >= total) return -1;
     const char *node = "";
     uint32_t off = off_struct;
     for (;;) {
+        if (off + 4 > total) return -1;
         uint32_t tok = be32(base + off);
         off += 4;
         if (tok == FDT_BEGIN_NODE) {
             node = (const char *)(base + off);
-            off += ALIGN4(strlen(node) + 1);
+            uint32_t n = 0;
+            while (off + n < total && base[off + n]) n++;
+            if (off + n >= total) return -1;
+            off += ALIGN4(n + 1);
         } else if (tok == FDT_PROP) {
+            if (off + 8 > total) return -1;
             uint32_t len = be32(base + off), nameoff = be32(base + off + 4);
+            if (len > total || off + 8 + len > total || off_strings + nameoff >= total) return -1;
             const char *name = (const char *)(base + off_strings + nameoff);
             int r = cb(ctx, node, name, base + off + 8, len);
             if (r) return r;
