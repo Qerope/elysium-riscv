@@ -7,6 +7,7 @@ LDFLAGS := -nostdlib -T linker.ld
 SRCS := arch/riscv64/entry.S kern/kmain.c
 SRCS += kern/kprintf.c
 SRCS += kern/fdt.c
+SRCS += kern/vm_page.c
 
 build/elysium.elf: $(SRCS) linker.ld
 	mkdir -p build
