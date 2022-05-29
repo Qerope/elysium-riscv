@@ -8,6 +8,7 @@ SRCS := arch/riscv64/entry.S kern/kmain.c
 SRCS += kern/kprintf.c
 SRCS += kern/fdt.c
 SRCS += kern/vm_page.c
+SRCS += arch/riscv64/boot.c
 
 build/elysium.elf: $(SRCS) linker.ld
 	mkdir -p build

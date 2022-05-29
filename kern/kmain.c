@@ -11,9 +11,11 @@ void kmain(uint64_t hartid, uint64_t dtb)
     (void)hartid;
     kprintf("Elysium booting on hart %d\n", (int)hartid);
     uint64_t base, size;
-    if (fdt_memory((const void *)dtb, &base, &size))
+    const void *fdt = phys_to_virt(dtb);
+    if (fdt_memory(fdt, &base, &size))
         panic("no memory node in device tree");
     kprintf("ram: %p, %x MiB\n", (void *)base, (unsigned)(size >> 20));
-    uint64_t free_start = (uint64_t)_kend;
+    uint64_t free_start = virt_to_phys(_kend);
+    vm_page_init(free_start, base + size - free_start);
     for (;;) __asm__ volatile("wfi");
 }
