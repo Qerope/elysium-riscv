@@ -39,3 +39,10 @@ void boot_enable_paging(uint64_t hartid, uint64_t dtb)
         :: "r"(SATP_SV39 | ((uint64_t)root >> 12)), "r"(kentry), "r"(a0), "r"(a1) : "memory");
     __builtin_unreachable();
 }
+
+/* Called from kmain once the kernel is running at its high address. */
+void boot_drop_identity(void)
+{
+    early_root[(PHYS_BASE >> 30) & 0x1ff] = 0;
+    tlb_flush_all();
+}

@@ -4,12 +4,14 @@
 #include <ely/platform.h>
 #include "fdt.h"
 #include <arch/vm_page.h>
+void boot_drop_identity(void);
 extern char _kend[];
 
 void kmain(uint64_t hartid, uint64_t dtb)
 {
     (void)hartid;
     kprintf("Elysium booting on hart %d\n", (int)hartid);
+    boot_drop_identity();
     uint64_t base, size;
     const void *fdt = phys_to_virt(dtb);
     if (fdt_memory(fdt, &base, &size))
