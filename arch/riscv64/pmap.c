@@ -12,6 +12,13 @@
 static inline uint64_t pte_pa(uint64_t pte) { return (pte >> 10) << 12; }
 static inline uint64_t pa_pte(uint64_t pa) { return (pa >> 12) << 10; }
 
+/* Sv39: bits 63:39 must equal bit 38. */
+static int canonical(uint64_t va)
+{
+    int64_t top = (int64_t)va >> 38;
+    return top == 0 || top == -1;
+}
+
 int pmap_init(pmap_t *pm)
 {
     uint64_t pa = vm_page_alloc();
@@ -44,6 +51,7 @@ static uint64_t *walk(pmap_t *pm, uint64_t va, int create)
 
 int pmap_enter(pmap_t *pm, uint64_t va, uint64_t pa, uint64_t prot)
 {
+    if (!canonical(va)) return -1;
     uint64_t *pte = walk(pm, va, 1);
     if (!pte) return -1;
     if (*pte & PTE_V) return -1;  /* callers must pmap_remove first */
@@ -61,6 +69,7 @@ int pmap_remove(pmap_t *pm, uint64_t va)
 
 uint64_t pmap_extract(pmap_t *pm, uint64_t va)
 {
+    if (!canonical(va)) return 0;
     uint64_t *pte = walk(pm, va, 0);
     if (!pte || !(*pte & PTE_V)) return 0;
     return pte_pa(*pte) | (va & (PAGE_SIZE - 1));
