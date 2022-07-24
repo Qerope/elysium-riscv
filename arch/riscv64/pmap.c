@@ -52,6 +52,7 @@ static uint64_t *walk(pmap_t *pm, uint64_t va, int create)
 int pmap_enter(pmap_t *pm, uint64_t va, uint64_t pa, uint64_t prot)
 {
     if (!canonical(va)) return -1;
+    if ((prot & PTE_W) && (prot & PTE_X)) return -1;  /* W^X */
     uint64_t *pte = walk(pm, va, 1);
     if (!pte) return -1;
     if (*pte & PTE_V) return -1;  /* callers must pmap_remove first */
