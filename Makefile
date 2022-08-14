@@ -21,3 +21,21 @@ build/elysium.bin: build/elysium.elf
 run: build/elysium.bin
 	qemu-system-riscv64 -machine virt -nographic -m 256M -bios default \
 		-device loader,file=$<,addr=0x80200000
+
+HOSTCC ?= cc
+HOSTFLAGS := -std=gnu11 -O1 -g -Wall -Wextra -DELY_HOST -Iinclude -Itests
+TESTS := build/test_fdt build/test_pmap
+
+build/test_fdt: tests/test_fdt.c kern/fdt.c tests/host.c
+	mkdir -p build
+	$(HOSTCC) $(HOSTFLAGS) -o $@ $^
+
+build/test_pmap: tests/test_pmap.c arch/riscv64/pmap.c kern/vm_page.c tests/host.c
+	mkdir -p build
+	$(HOSTCC) $(HOSTFLAGS) -Iarch/riscv64 -o $@ $^
+
+test: $(TESTS)
+	for t in $(TESTS); do $$t || exit 1; done
+
+clean:
+	rm -rf build
