@@ -4,6 +4,7 @@
 #include <ely/platform.h>
 #include "fdt.h"
 #include <arch/vm_page.h>
+#include <arch/trap.h>
 void boot_drop_identity(void);
 extern char _kend[];
 
@@ -19,5 +20,6 @@ void kmain(uint64_t hartid, uint64_t dtb)
     kprintf("ram: %p, %x MiB\n", (void *)base, (unsigned)(size >> 20));
     uint64_t free_start = virt_to_phys(_kend);
     vm_page_init(free_start, base + size - free_start);
+    trap_init();
     for (;;) __asm__ volatile("wfi");
 }
