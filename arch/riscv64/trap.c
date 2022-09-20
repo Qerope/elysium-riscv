@@ -21,5 +21,6 @@ void trap_handler(struct trapframe *tf)
         }
         return;
     }
-    panic("trap");
+    kprintf("fault: scause=%d sepc=%p stval=%p\n", (int)cause, (void *)tf->sepc, (void *)tf->stval);
+    panic("unhandled exception");
 }
