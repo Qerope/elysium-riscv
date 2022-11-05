@@ -11,6 +11,7 @@ SRCS += kern/vm_page.c
 SRCS += arch/riscv64/boot.c
 SRCS += arch/riscv64/pmap.c
 SRCS += arch/riscv64/trap.S arch/riscv64/trap.c
+SRCS += dev/timer.c
 
 build/elysium.elf: $(SRCS) linker.ld
 	mkdir -p build

@@ -4,10 +4,12 @@
 #include <ely/platform.h>
 
 extern void trap_entry(void);
+void timer_intr(void);
 
 void trap_init(void)
 {
     csr_write(stvec, trap_entry);
+    csr_set(sie, SIE_STIE);
 }
 
 void trap_handler(struct trapframe *tf)
@@ -17,6 +19,7 @@ void trap_handler(struct trapframe *tf)
     cause &= ~(1UL << 63);
     if (is_intr) {
         switch (cause) {
+        case 5: timer_intr(); break;
         default: kprintf("unexpected interrupt %d\n", (int)cause); break;
         }
         return;
