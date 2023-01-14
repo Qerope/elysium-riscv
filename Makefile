@@ -12,6 +12,7 @@ SRCS += arch/riscv64/boot.c
 SRCS += arch/riscv64/pmap.c
 SRCS += arch/riscv64/trap.S arch/riscv64/trap.c
 SRCS += dev/timer.c
+SRCS += arch/riscv64/switch.S kern/sched.c
 
 build/elysium.elf: $(SRCS) linker.ld
 	mkdir -p build
@@ -34,6 +35,9 @@ build/test_fdt: tests/test_fdt.c kern/fdt.c tests/host.c
 
 build/test_pmap: tests/test_pmap.c arch/riscv64/pmap.c kern/vm_page.c tests/host.c
 	mkdir -p build
+	$(HOSTCC) $(HOSTFLAGS) -Iarch/riscv64 -o $@ $^
+
+build/test_sched: tests/test_sched.c kern/sched.c tests/host.c
 	$(HOSTCC) $(HOSTFLAGS) -Iarch/riscv64 -o $@ $^
 
 test: $(TESTS)

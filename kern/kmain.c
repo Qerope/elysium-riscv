@@ -5,9 +5,12 @@
 #include "fdt.h"
 #include <arch/vm_page.h>
 #include <arch/trap.h>
+#include <ely/sched.h>
 void timer_init(void);
 void boot_drop_identity(void);
 extern char _kend[];
+
+static struct thread idle;
 
 void kmain(uint64_t hartid, uint64_t dtb)
 {
@@ -22,6 +25,7 @@ void kmain(uint64_t hartid, uint64_t dtb)
     uint64_t free_start = virt_to_phys(_kend);
     vm_page_init(free_start, base + size - free_start);
     trap_init();
+    sched_init(&idle);
     timer_init();
     csr_set(sstatus, SSTATUS_SIE);
     for (;;) __asm__ volatile("wfi");

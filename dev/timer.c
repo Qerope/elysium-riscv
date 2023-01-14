@@ -1,6 +1,7 @@
 #include <arch/sbi.h>
 #include <csr.h>
 #include <ely/platform.h>
+#include <ely/sched.h>
 
 #define TICK_HZ 100
 #define TIMEBASE_HZ 10000000UL  /* qemu virt; later read from the device tree */
