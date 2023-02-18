@@ -27,7 +27,7 @@ run: build/elysium.bin
 
 HOSTCC ?= cc
 HOSTFLAGS := -std=gnu11 -O1 -g -Wall -Wextra -DELY_HOST -Iinclude -Itests
-TESTS := build/test_fdt build/test_pmap
+TESTS := build/test_fdt build/test_pmap build/test_sched
 
 build/test_fdt: tests/test_fdt.c kern/fdt.c tests/host.c
 	mkdir -p build

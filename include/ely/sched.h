@@ -20,3 +20,6 @@ struct thread {
 void ctx_switch(struct ctx *old, struct ctx *new_);
 void sched_init(struct thread *idle);
 void sched_enqueue(struct thread *t);
+void sched_tick(void);
+void schedule(void);
+extern struct thread *current;

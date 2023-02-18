@@ -26,6 +26,11 @@ int main(void)
     assert(current == &b);    /* round robin */
     schedule();
     assert(current == &a);
+
+    /* quantum expiry only switches when another thread of >= priority is waiting */
+    current->quantum = 1;
+    sched_tick();
+    assert(current == &b);
     printf("ok\n");
     return 0;
 }

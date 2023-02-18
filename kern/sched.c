@@ -45,8 +45,18 @@ void schedule(void)
     if (prev->state == T_RUN && prev != idle_thread) enqueue_locked(prev);
     struct thread *next = pick_locked();
     next->state = T_RUN;
+    next->quantum = QUANTUM_TICKS;
     if (next != prev) {
         current = next;
         ctx_switch(&prev->ctx, &next->ctx);
     }
+}
+
+/* Called from the timer interrupt. Only switches if somebody of equal or higher priority waits. */
+void sched_tick(void)
+{
+    if (--current->quantum > 0) return;
+    current->quantum = QUANTUM_TICKS;
+    if (bitmap && (31 - __builtin_clz(bitmap)) >= current->pri)
+        schedule();
 }

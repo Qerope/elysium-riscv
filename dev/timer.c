@@ -20,4 +20,5 @@ void timer_intr(void)
     if (!next) next = csr_read(time);
     next += interval;
     sbi_set_timer(next);
+    sched_tick();
 }
