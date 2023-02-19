@@ -36,11 +36,14 @@ static struct thread *pick_locked(void)
 
 void sched_enqueue(struct thread *t)
 {
+    unsigned long f = irq_save();
     enqueue_locked(t);
+    irq_restore(f);
 }
 
 void schedule(void)
 {
+    unsigned long f = irq_save();
     struct thread *prev = current;
     if (prev->state == T_RUN && prev != idle_thread) enqueue_locked(prev);
     struct thread *next = pick_locked();
@@ -50,6 +53,7 @@ void schedule(void)
         current = next;
         ctx_switch(&prev->ctx, &next->ctx);
     }
+    irq_restore(f);
 }
 
 /* Called from the timer interrupt. Only switches if somebody of equal or higher priority waits. */
