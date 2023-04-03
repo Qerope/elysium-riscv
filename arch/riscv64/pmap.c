@@ -57,6 +57,7 @@ int pmap_enter(pmap_t *pm, uint64_t va, uint64_t pa, uint64_t prot)
     if (!pte) return -1;
     if (*pte & PTE_V) return -1;  /* callers must pmap_remove first */
     *pte = pa_pte(pa) | prot | PTE_V | PTE_A | PTE_D;
+    tlb_flush_va(va);
     return 0;
 }
 
@@ -65,6 +66,7 @@ int pmap_remove(pmap_t *pm, uint64_t va)
     uint64_t *pte = walk(pm, va, 0);
     if (!pte || !(*pte & PTE_V)) return -1;
     *pte = 0;
+    tlb_flush_va(va);
     return 0;
 }
 
