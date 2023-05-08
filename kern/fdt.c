@@ -80,3 +80,33 @@ int fdt_memory(const void *fdt, uint64_t *base, uint64_t *size)
     *size = m.size;
     return 0;
 }
+
+struct reg_ctx { const char *compat; uint64_t base, size; int found; const char *node; };
+
+static int compat_cb(void *c, const char *node, const char *name, const uint8_t *val, uint32_t len)
+{
+    struct reg_ctx *r = c;
+    if (strncmp(name, "compatible", 11) == 0) {
+        for (uint32_t i = 0; i < len; i += strlen((const char *)val + i) + 1)
+            if (strncmp((const char *)val + i, r->compat, strlen(r->compat) + 1) == 0)
+                r->node = node;
+    } else if (r->node && node == r->node && strncmp(name, "reg", 4) == 0 && len >= 16) {
+        r->base = be64(val);
+        r->size = be64(val + 8);
+        r->found = 1;
+        return 1;
+    }
+    return 0;
+}
+
+/* "compatible" precedes "reg" in sane trees; qemu emits it that way for every virt device,
+   and the walk is a single pass so out-of-order trees are not supported. */
+int fdt_find_reg(const void *fdt, const char *compat, uint64_t *base, uint64_t *size)
+{
+    struct reg_ctx r = {.compat = compat};
+    int rc = walk(fdt, compat_cb, &r);
+    if (rc < 0 || !r.found) return -1;
+    *base = r.base;
+    *size = r.size;
+    return 0;
+}

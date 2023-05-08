@@ -11,6 +11,7 @@
 #define PTE_G (1UL << 5)
 #define PTE_A (1UL << 6)
 #define PTE_D (1UL << 7)
+#define DEVBASE 0xffffffff40000000UL
 
 /* In .data (not .bss): bss is cleared after paging is on, which would wipe the live tables. */
 __attribute__((section(".data.boot"), aligned(4096))) uint64_t early_root[512];
@@ -27,6 +28,8 @@ void boot_enable_paging(uint64_t hartid, uint64_t dtb)
 
     root[(PHYS_BASE >> 30) & 0x1ff] = gigapage;  /* identity, needed for the next few instructions */
     root[(KERNBASE >> 30) & 0x1ff] = gigapage;   /* kernel at the top of the address space */
+    /* first GiB (UART, PLIC, ...) as non-executable device memory at DEVBASE */
+    root[(DEVBASE >> 30) & 0x1ff] = (0UL << 10) | PTE_V | PTE_R | PTE_W | PTE_G | PTE_A | PTE_D;
 
     uint64_t kentry = (uint64_t)kernel_entry - PHYS_BASE + KERNBASE;
     register uint64_t a0 __asm__("a0") = hartid;

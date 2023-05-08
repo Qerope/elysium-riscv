@@ -6,6 +6,8 @@
 #include <arch/vm_page.h>
 #include <arch/trap.h>
 #include <ely/sched.h>
+
+void uart_init(const void *fdt);
 void timer_init(void);
 void boot_drop_identity(void);
 extern char _kend[];
@@ -24,6 +26,7 @@ void kmain(uint64_t hartid, uint64_t dtb)
     kprintf("ram: %p, %x MiB\n", (void *)base, (unsigned)(size >> 20));
     uint64_t free_start = virt_to_phys(_kend);
     vm_page_init(free_start, base + size - free_start);
+    uart_init(fdt);
     trap_init();
     sched_init(&idle);
     timer_init();
