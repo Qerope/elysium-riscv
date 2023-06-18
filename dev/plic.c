@@ -30,7 +30,9 @@ void plic_init(const void *fdt, uint64_t hart)
 void plic_intr(void)
 {
     uint32_t irq = CLAIM(ctx);
-    CLAIM(ctx) = irq;
     if (irq == UART_IRQ)
         uart_intr();
+    /* complete only after the device was serviced, or a level interrupt fires again at once */
+    if (irq)
+        CLAIM(ctx) = irq;
 }
