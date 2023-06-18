@@ -14,6 +14,7 @@ SRCS += arch/riscv64/trap.S arch/riscv64/trap.c
 SRCS += dev/timer.c
 SRCS += arch/riscv64/switch.S kern/sched.c
 SRCS += dev/uart.c
+SRCS += dev/plic.c
 
 build/elysium.elf: $(SRCS) linker.ld
 	mkdir -p build

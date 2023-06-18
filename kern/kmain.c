@@ -8,6 +8,7 @@
 #include <ely/sched.h>
 
 void uart_init(const void *fdt);
+void plic_init(const void *fdt, uint64_t hart);
 void timer_init(void);
 void boot_drop_identity(void);
 extern char _kend[];
@@ -29,6 +30,7 @@ void kmain(uint64_t hartid, uint64_t dtb)
     uart_init(fdt);
     trap_init();
     sched_init(&idle);
+    plic_init(fdt, hartid);
     timer_init();
     csr_set(sstatus, SSTATUS_SIE);
     for (;;) __asm__ volatile("wfi");
