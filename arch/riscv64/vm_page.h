@@ -3,4 +3,5 @@
 
 void vm_page_init(uint64_t base, uint64_t size);
 uint64_t vm_page_alloc(void);
-void vm_page_free(uint64_t pa);
+int vm_page_free(uint64_t pa);
+uint64_t vm_page_count_free(void);

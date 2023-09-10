@@ -22,6 +22,8 @@ int main(void)
     assert(pmap_enter(&pm, 0xffffffc000000000UL, pa, PTE_R) == 0);         /* canonical high half */
     assert(pmap_remove(&pm, 0x400000) == 0);
     assert(pmap_extract(&pm, 0x400000) == 0);
+    assert(vm_page_free(pa) == 0);
+    assert(vm_page_free(pa) == -1);                                          /* double free detected */
     printf("ok\n");
     return 0;
 }
