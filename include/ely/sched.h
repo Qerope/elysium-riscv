@@ -13,6 +13,7 @@ enum { T_RUN, T_READY, T_SLEEP, T_DEAD };
 struct thread {
     struct ctx ctx;
     int id, pri, state, quantum;
+    const void *wchan;
     struct thread *next;
     void *kstack;
 };
@@ -23,3 +24,5 @@ void sched_enqueue(struct thread *t);
 void sched_tick(void);
 void schedule(void);
 extern struct thread *current;
+void thread_block(const void *wchan);
+void thread_wakeup(const void *wchan);

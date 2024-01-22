@@ -31,6 +31,13 @@ int main(void)
     current->quantum = 1;
     sched_tick();
     assert(current == &b);
+
+    /* sleeping and waking */
+    int chan;
+    thread_block(&chan);
+    assert(b.state == T_SLEEP);
+    thread_wakeup(&chan);
+    assert(b.state == T_READY);
     printf("ok\n");
     return 0;
 }

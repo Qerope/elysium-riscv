@@ -6,6 +6,7 @@ struct thread *current;
 static struct thread *idle_thread;
 static struct thread *head[NPRI], *tail[NPRI];
 static uint32_t bitmap;
+static struct thread *sleepq;
 
 void sched_init(struct thread *idle)
 {
@@ -63,4 +64,32 @@ void sched_tick(void)
     current->quantum = QUANTUM_TICKS;
     if (bitmap && (31 - __builtin_clz(bitmap)) >= current->pri)
         schedule();
+}
+
+void thread_block(const void *wchan)
+{
+    unsigned long f = irq_save();
+    current->state = T_SLEEP;
+    current->wchan = wchan;
+    current->next = sleepq;
+    sleepq = current;
+    schedule();
+    irq_restore(f);
+}
+
+void thread_wakeup(const void *wchan)
+{
+    unsigned long f = irq_save();
+    struct thread **pp = &sleepq;
+    while (*pp) {
+        struct thread *t = *pp;
+        if (t->wchan == wchan) {
+            *pp = t->next;
+            t->wchan = NULL;
+            enqueue_locked(t);
+        } else {
+            pp = &t->next;
+        }
+    }
+    irq_restore(f);
 }
