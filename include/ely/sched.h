@@ -16,6 +16,7 @@ struct thread {
     const void *wchan;
     struct thread *next;
     void *kstack;
+    struct task *task;
 };
 
 void ctx_switch(struct ctx *old, struct ctx *new_);
