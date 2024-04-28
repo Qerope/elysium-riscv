@@ -16,6 +16,7 @@ SRCS += arch/riscv64/switch.S kern/sched.c
 SRCS += dev/uart.c
 SRCS += dev/plic.c
 SRCS += kern/task.c
+SRCS += kern/ipc.c
 
 build/elysium.elf: $(SRCS) linker.ld
 	mkdir -p build
@@ -30,7 +31,7 @@ run: build/elysium.bin
 
 HOSTCC ?= cc
 HOSTFLAGS := -std=gnu11 -O1 -g -Wall -Wextra -DELY_HOST -Iinclude -Itests
-TESTS := build/test_fdt build/test_pmap build/test_sched
+TESTS := build/test_fdt build/test_pmap build/test_sched build/test_ipc
 
 build/test_fdt: tests/test_fdt.c kern/fdt.c tests/host.c
 	mkdir -p build
@@ -41,6 +42,9 @@ build/test_pmap: tests/test_pmap.c arch/riscv64/pmap.c kern/vm_page.c tests/host
 	$(HOSTCC) $(HOSTFLAGS) -Iarch/riscv64 -o $@ $^
 
 build/test_sched: tests/test_sched.c kern/sched.c tests/host.c
+	$(HOSTCC) $(HOSTFLAGS) -Iarch/riscv64 -o $@ $^
+
+build/test_ipc: tests/test_ipc.c kern/ipc.c kern/sched.c tests/host.c
 	$(HOSTCC) $(HOSTFLAGS) -Iarch/riscv64 -o $@ $^
 
 test: $(TESTS)
