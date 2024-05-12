@@ -18,10 +18,12 @@ int port_send(struct port *p, const struct msg *m)
 
 int port_receive(struct port *p, struct msg *out)
 {
+    unsigned long f = irq_save();
     while (p->count == 0)
         thread_block(p);
     *out = p->q[p->head];
     p->head = (p->head + 1) % PORT_QUEUE;
     p->count--;
+    irq_restore(f);
     return 0;
 }
