@@ -3,6 +3,7 @@
 
 struct cpu {
     uint64_t hartid;
+    struct thread *idle;
     volatile int online;
 };
 
