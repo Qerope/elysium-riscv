@@ -18,6 +18,7 @@ SRCS += dev/plic.c
 SRCS += kern/task.c
 SRCS += kern/ipc.c
 SRCS += kern/smp.c
+SRCS += kern/syscall.c
 
 build/elysium.elf: $(SRCS) linker.ld
 	mkdir -p build
