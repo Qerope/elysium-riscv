@@ -16,10 +16,17 @@ static inline struct sbiret sbi_ecall(long eid, long fid, long a0, long a1, long
 #define SBI_EXT_BASE 0x10
 #define SBI_EXT_TIME 0x54494D45
 #define SBI_EXT_HSM 0x48534D
+#define SBI_EXT_DBCN 0x4442434E
 
 static inline void sbi_putchar_legacy(int c) { sbi_ecall(1, 0, c, 0, 0); }
 static inline void sbi_set_timer(uint64_t t) { sbi_ecall(SBI_EXT_TIME, 0, (long)t, 0, 0); }
 static inline struct sbiret sbi_hart_start(long hart, long addr, long opaque) {
     return sbi_ecall(SBI_EXT_HSM, 0, hart, addr, opaque);
 }
-#define sbi_putchar sbi_putchar_legacy
+static inline int sbi_probe(long ext) { return (int)sbi_ecall(SBI_EXT_BASE, 3, ext, 0, 0).value; }
+static inline void sbi_putchar(int c) {
+    static int dbcn = -1;
+    if (dbcn < 0) dbcn = sbi_probe(SBI_EXT_DBCN);
+    if (dbcn) sbi_ecall(SBI_EXT_DBCN, 2, c, 0, 0);  /* write_byte */
+    else sbi_putchar_legacy(c);
+}
