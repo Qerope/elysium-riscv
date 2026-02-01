@@ -2,11 +2,13 @@
 
 #include <csr.h>
 #include <ely/platform.h>
+#include <ely/task.h>
 
 extern void trap_entry(void);
 void timer_intr(void);
 void plic_intr(void);
 long syscall_dispatch(struct trapframe *tf);
+int vm_fault(struct task *t, uint64_t va);
 
 void trap_init(void)
 {
@@ -28,6 +30,8 @@ void trap_handler(struct trapframe *tf)
         }
         return;
     }
+    if ((cause == 12 || cause == 13 || cause == 15) && current->task && vm_fault(current->task, tf->stval) == 0)
+        return;  /* instruction/load/store page fault, handled */
     if (cause == 8) {  /* ecall from U-mode */
         tf->sepc += 4;
         tf->x[10] = syscall_dispatch(tf);

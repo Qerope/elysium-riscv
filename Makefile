@@ -20,6 +20,7 @@ SRCS += kern/ipc.c
 SRCS += kern/smp.c
 SRCS += kern/syscall.c
 SRCS += kern/user.c
+SRCS += kern/vm_fault.c
 
 build/elysium.elf: $(SRCS) linker.ld
 	mkdir -p build
