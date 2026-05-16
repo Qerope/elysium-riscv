@@ -17,3 +17,10 @@ direct map is on the list.
 Mach style: a *task* owns an address space and a set of threads; *ports* are
 the only way tasks talk to each other. System calls with a negative number are
 Mach traps, positive numbers are the BSD layer.
+
+## Porting to arm64
+
+Real phone-class hardware is AArch64. The kernel is currently RISC-V only. A
+port needs: an `arch/arm64` tree (entry, exception vectors, MMU with 4K
+granule), a GICv3 driver instead of the PLIC, and the generic timer instead of
+the SBI timer. Anything in `kern/` that includes `<csr.h>` directly is a bug.
