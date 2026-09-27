@@ -41,6 +41,15 @@ int main(void)
     blob[0] = 0;  /* bad magic */
     assert(fdt_memory(blob, &base, &size) == -1);
     blob[0] = 0xd0;
+
+    /* Every truncation of a valid blob must fail cleanly, never read out of bounds. */
+    for (uint32_t t = 0; t < total; t++) {
+        uint8_t copy[512];
+        memset(copy, 0, sizeof copy);
+        memcpy(copy, blob, t);
+        copy[4] = t >> 24; copy[5] = t >> 16; copy[6] = t >> 8; copy[7] = t;  /* totalsize = t */
+        (void)fdt_memory(copy, &base, &size);
+    }
     printf("ok\n");
     return 0;
 }
